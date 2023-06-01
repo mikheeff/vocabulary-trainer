@@ -15,6 +15,12 @@ interface TrainerUIListeners {
   onLetterClick: (index: number) => void;
 }
 
+interface TrainerStats {
+  wordsWithoutMistakes: string;
+  mistakesAmount: string;
+  mostMistakeWord: string;
+}
+
 enum ButtonType {
   SUCCESS = "SUCCESS",
   DANGER = "DANGER",
@@ -43,6 +49,16 @@ export class TrainerUI {
     document.querySelector("#letters");
   private answerContainerEl: HTMLDivElement | null =
     document.querySelector("#answer");
+  private statsTableEl: HTMLTableElement | null =
+    document.querySelector("#stats");
+  private trainerEl: HTMLDivElement | null = document.querySelector("#trainer");
+  private wordsWithoutMistakeCellEl: HTMLElement | null =
+    document.querySelector("#words_without_mistake");
+  private mistakesCellEl: HTMLElement | null =
+    document.querySelector("#mistakes_amount");
+  private mostMistakeWordCellEl: HTMLElement | null = document.querySelector(
+    "#word_most_mistakes"
+  );
 
   constructor(props: TrainerUIProps) {
     this.letters = props.letters;
@@ -107,6 +123,26 @@ export class TrainerUI {
     );
   }
 
+  public showStats(stats: TrainerStats) {
+    if (this.trainerEl) {
+      this.trainerEl.style.display = "none";
+    }
+
+    if (this.wordsWithoutMistakeCellEl) {
+      this.wordsWithoutMistakeCellEl.textContent = stats.wordsWithoutMistakes;
+    }
+    if (this.mistakesCellEl) {
+      this.mistakesCellEl.textContent = stats.mistakesAmount;
+    }
+    if (this.mostMistakeWordCellEl) {
+      this.mostMistakeWordCellEl.textContent = stats.mostMistakeWord;
+    }
+
+    if (this.statsTableEl) {
+      this.statsTableEl.style.display = "table";
+    }
+  }
+
   private render() {
     this.renderCounters();
     this.renderLetters();
@@ -168,7 +204,6 @@ export class TrainerUI {
   }
 
   private handleKeypressEvent = (event: KeyboardEvent) => {
-    console.log('key');
     const onLetterClick = this.onLetterClick;
     const index = this.letters.findIndex((letter) => letter === event.key);
 

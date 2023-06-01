@@ -6,6 +6,8 @@ import { TrainerUI } from "./classes/TrainerUI";
 const DEFAULT_ROUNDS_AMOUNT = 6;
 
 export default class App {
+  private game: Game | null = null;
+  private ui: TrainerUI | null = null;
   private isLoading: boolean = false;
 
   public init(): void {
@@ -13,54 +15,68 @@ export default class App {
       (word, index) => index < DEFAULT_ROUNDS_AMOUNT
     );
 
-    const game = new Game(words);
-    const ui = new TrainerUI({
-      letters: game.shuffledLetters,
+    this.game = new Game(words);
+    this.ui = new TrainerUI({
+      letters: this.game.shuffledLetters,
       answerLetters: [],
-      questionsAmount: game.roundsAmount,
-      questionNumber: game.round,
+      questionsAmount: this.game.roundsAmount,
+      questionNumber: this.game.round,
     });
 
-    ui.setListeners({ onLetterClick: this.getButtonClickHandler(game, ui) });
-    ui.init();
+    this.ui.setListeners({ onLetterClick: this.getButtonClickHandler() });
+    this.ui.init();
   }
 
-  private getButtonClickHandler(game: Game, ui: TrainerUI) {
+  private getButtonClickHandler() {
     return (index: number) => {
-      if (this.isLoading) {
+      if (this.isLoading || !this.game || !this.ui) {
         return;
       }
 
-      const isCorrect = game.checkLetter(index);
+      const isCorrect = this.game.checkLetter(index);
 
-      if (!isCorrect && !game.isRoundFailed) {
-        ui.highlightLetterError(index);
+      if (!isCorrect && !this.game.isRoundFailed) {
+        this.ui.highlightLetterError(index);
 
         return;
       }
 
-      if (game.isRoundFailed) {
-        ui.setIsError(true);
+      if (this.game.isRoundFailed) {
+        this.ui.setIsError(true);
       }
 
-      ui.setLetters(game.shuffledLetters, game.answeredLetters);
+      this.ui.setLetters(this.game.shuffledLetters, this.game.answeredLetters);
 
-      if (game.isRoundCompleted) {
+      if (this.game.isRoundCompleted) {
         this.isLoading = true;
 
-        window.setTimeout(() => {
-          game.initNextRound();
-          ui.setQuestionNumber(game.round);
-          ui.setIsError(false);
-          ui.setLetters(game.shuffledLetters, game.answeredLetters);
-          this.isLoading = false;
-        }, 1000);
-      }
-
-      if (game.isFinished) {
-        ui.removeListeners();
-        console.log("finished");
+        window.setTimeout(() => this.handleRoundCompletion(), 1000);
       }
     };
+  }
+
+  handleRoundCompletion() {
+    if (!this.game || !this.ui) {
+      return;
+    }
+
+    this.game.initNextRound();
+
+    if (this.game.isFinished) {
+      this.ui.removeListeners();
+
+      this.ui.showStats({
+        wordsWithoutMistakes: String(this.game.getWordsAmountWithoutMistakes()),
+        mistakesAmount: String(this.game.getTotalMistakesAmount()),
+        mostMistakeWord: this.game.getWordWithMostMistakes() ?? "-",
+      });
+
+      return;
+    }
+
+    this.ui.setQuestionNumber(this.game.round);
+    this.ui.setIsError(false);
+    this.ui.setLetters(this.game.shuffledLetters, this.game.answeredLetters);
+    this.isLoading = false;
   }
 }

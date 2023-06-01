@@ -68,12 +68,39 @@ export default class Game {
     }
 
     this.round = this.round + 1;
+
+    if (this.round > this.roundsAmount) {
+      this.isFinished = true;
+
+      return;
+    }
+
     this.letterIndex = INITIAL_LETTER_INDEX;
     this.setShuffledLetters();
+  }
 
-    if (this.round === this.roundsAmount) {
-      this.isFinished = true;
+  public getWordsAmountWithoutMistakes(): number {
+    return this.words.reduce((acc, word) => {
+      return word.mistakeAmount === 0 ? acc + 1 : acc;
+    }, 0);
+  }
+
+  public getTotalMistakesAmount(): number {
+    return this.words.reduce((acc, word) => {
+      return acc + word.mistakeAmount;
+    }, 0);
+  }
+
+  public getWordWithMostMistakes(): string | null {
+    if (this.getTotalMistakesAmount() === 0) {
+      return null;
     }
+
+    return this.words.reduce((maxMistakeWord, currentWord) => {
+      return currentWord.mistakeAmount > maxMistakeWord.mistakeAmount
+        ? currentWord
+        : maxMistakeWord;
+    }).text;
   }
 
   private countMistake(): void {

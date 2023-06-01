@@ -2,7 +2,7 @@ import App from "./src/app";
 
 const app = new App();
 
-app.init()
+app.init();
 
 if (module.hot) {
   module.hot.dispose(() => {

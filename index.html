@@ -17,36 +17,59 @@
       >
         <h2 class="mb-5">English Vocabulary Trainer</h2>
 
-        <p class="lead mb-1">
-          Form a valid English word using the given letters
-        </p>
-        <p class="mb-5">
-          Question <span id="current_question">1</span> of
-          <span id="total_questions">10</span>
-        </p>
+        <table
+          id="stats"
+          class="table"
+          style="text-align: left; border: 1px solid #dee2e6; display: none"
+        >
+          <tbody>
+            <tr>
+              <td>Words without mistake</td>
+              <td id="words_without_mistake"></td>
+            </tr>
+            <tr>
+              <td>Mistakes amount</td>
+              <td id="mistakes_amount"></td>
+            </tr>
+            <tr>
+              <td>The word with the most mistakes</td>
+              <td id="word_most_mistakes"></td>
+            </tr>
+          </tbody>
+        </table>
+        <div id="trainer">
+          <p class="lead mb-1">
+            Form a valid English word using the given letters
+          </p>
 
-        <div>
-          <div
-            id="answer"
-            class="bg-light mx-1 mb-3"
-            style="
-              height: 46px;
-              border-radius: 6px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              gap: 8px;
-            "
-          ></div>
-          <div
-            id="letters"
-            style="
-              display: flex;
-              gap: 8px;
-              align-items: center;
-              justify-content: center;
-            "
-          ></div>
+          <p class="mb-5">
+            Question <span id="current_question">1</span> of
+            <span id="total_questions">10</span>
+          </p>
+
+          <div>
+            <div
+              id="answer"
+              class="bg-light mx-1 mb-3"
+              style="
+                height: 46px;
+                border-radius: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+              "
+            ></div>
+            <div
+              id="letters"
+              style="
+                display: flex;
+                gap: 8px;
+                align-items: center;
+                justify-content: center;
+              "
+            ></div>
+          </div>
         </div>
       </div>
     </div>
