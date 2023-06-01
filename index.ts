@@ -1,7 +1,14 @@
-import { initApp } from "./src/app";
+import App from "./src/app";
 
-initApp();
+const app = new App();
+
+app.init()
 
 if (module.hot) {
+  module.hot.dispose(() => {
+    // remove global listeners
+    document.removeEventListener("keypress", window.trainerKeypressHandler);
+  });
+
   module.hot.accept();
 }

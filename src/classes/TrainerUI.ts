@@ -1,14 +1,8 @@
-enum ButtonType {
-  SUCCESS = "SUCCESS",
-  DANGER = "DANGER",
-  PRIMARY = "PRIMARY",
+declare global {
+  interface Window {
+    trainerKeypressHandler: any;
+  }
 }
-
-const BUTTON_LABEL_MAP: Record<ButtonType, string> = {
-  [ButtonType.SUCCESS]: "btn-success",
-  [ButtonType.DANGER]: "btn-danger",
-  [ButtonType.PRIMARY]: "btn-primary",
-};
 
 interface TrainerUIProps {
   letters: string[];
@@ -21,11 +15,24 @@ interface TrainerUIListeners {
   onLetterClick: (index: number) => void;
 }
 
+enum ButtonType {
+  SUCCESS = "SUCCESS",
+  DANGER = "DANGER",
+  PRIMARY = "PRIMARY",
+}
+
+const BUTTON_LABEL_MAP: Record<ButtonType, string> = {
+  [ButtonType.SUCCESS]: "btn-success",
+  [ButtonType.DANGER]: "btn-danger",
+  [ButtonType.PRIMARY]: "btn-primary",
+};
+
 export class TrainerUI {
   private letters: string[] = [];
   private answerLetters: string[] = [];
   private questionNumber: number = 0;
   private onLetterClick: ((index: number) => void) | undefined = undefined;
+  private isError: boolean = false;
   private readonly questionsAmount: number = 0;
 
   private currentQuestionEl: HTMLSpanElement | null =
@@ -50,25 +57,62 @@ export class TrainerUI {
 
   public setQuestionNumber(questionNumber: number) {
     this.questionNumber = questionNumber;
+
+    this.renderCounters();
   }
 
   public setLetters(letters: string[], answerLetters: string[]) {
     this.letters = letters;
     this.answerLetters = answerLetters;
 
-    this.render();
+    this.renderLetters();
+  }
+
+  public setIsError(value: boolean) {
+    this.isError = value;
   }
 
   public init() {
     this.render();
     document.addEventListener("keypress", this.handleKeypressEvent);
+    window.trainerKeypressHandler = this.handleKeypressEvent;
   }
 
   public removeListeners() {
     document.removeEventListener("keypress", this.handleKeypressEvent);
   }
 
+  public highlightLetterError(index: number) {
+    if (!this.lettersContainerEl) {
+      return;
+    }
+
+    const letterButton = this.lettersContainerEl.children[index];
+
+    if (!letterButton) {
+      return;
+    }
+
+    letterButton.classList.replace(
+      BUTTON_LABEL_MAP.PRIMARY,
+      BUTTON_LABEL_MAP.DANGER
+    );
+    window.setTimeout(
+      () =>
+        letterButton.classList.replace(
+          BUTTON_LABEL_MAP.DANGER,
+          BUTTON_LABEL_MAP.PRIMARY
+        ),
+      400
+    );
+  }
+
   private render() {
+    this.renderCounters();
+    this.renderLetters();
+  }
+
+  private renderCounters() {
     if (this.currentQuestionEl) {
       this.currentQuestionEl.textContent = String(this.questionNumber);
     }
@@ -76,7 +120,9 @@ export class TrainerUI {
     if (this.totalQuestionsEl) {
       this.totalQuestionsEl.textContent = String(this.questionsAmount);
     }
+  }
 
+  private renderLetters() {
     const lettersEls = this.letters.map((letter, index) =>
       this.getLetterEl(letter, ButtonType.PRIMARY, index)
     );
@@ -85,8 +131,10 @@ export class TrainerUI {
       this.lettersContainerEl.replaceChildren(...lettersEls);
     }
 
+    const type = this.isError ? ButtonType.DANGER : ButtonType.SUCCESS;
+
     const answerLettersEls = this.answerLetters.map((letter) =>
-      this.getLetterEl(letter, ButtonType.SUCCESS)
+      this.getLetterEl(letter, type)
     );
 
     if (this.answerContainerEl) {
@@ -112,7 +160,6 @@ export class TrainerUI {
 
     if (onLetterClick && index !== undefined) {
       letterEl.addEventListener("click", () => {
-        console.log("click");
         onLetterClick(index);
       });
     }
@@ -121,9 +168,9 @@ export class TrainerUI {
   }
 
   private handleKeypressEvent = (event: KeyboardEvent) => {
+    console.log('key');
     const onLetterClick = this.onLetterClick;
     const index = this.letters.findIndex((letter) => letter === event.key);
-    console.log("key");
 
     if (onLetterClick) {
       onLetterClick(index);
