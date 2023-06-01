@@ -4,10 +4,12 @@ const INITIAL_ROUND = 1;
 const INITIAL_LETTER_INDEX = 0;
 
 export default class Game {
+  public round: number;
+  public shuffledLetters: string[] = [];
+  public isFinished: boolean = false;
+
   private readonly words: string[];
   private letterIndex: number = INITIAL_LETTER_INDEX;
-  public round: number;
-  public shuffledLetters: string = "";
 
   constructor(words: string[], round: number = INITIAL_ROUND) {
     this.words = words;
@@ -24,35 +26,24 @@ export default class Game {
     return this.words.length;
   }
 
-  get isFinished(): boolean {
-    return this.round >= this.roundsAmount;
+  get answeredLetters(): string[] {
+    return this.currentWord.slice(0, this.letterIndex).split("");
   }
 
-  get currentWord(): string {
-    return this.words[this.round - 1];
-  }
-
-  private initNextRound() {
-    if (this.isFinished) {
-      return;
-    }
-
-    this.round = this.round + 1;
-    this.letterIndex = INITIAL_LETTER_INDEX;
-    this.setShuffledLetters();
-  }
-
-  public checkLetter(index: number): boolean {
-    if (index >= this.currentWord.length || index < 0) {
+  public checkLetter(checkIndex: number): boolean {
+    if (checkIndex >= this.currentWord.length || checkIndex < 0) {
+      // count mistake
       return false;
     }
 
-    const letter = this.shuffledLetters[index];
-
+    const letter = this.shuffledLetters[checkIndex];
     const isCorrect = this.currentWord[this.letterIndex] === letter;
 
     if (isCorrect) {
       this.letterIndex = this.letterIndex + 1;
+      this.shuffledLetters = this.shuffledLetters.filter(
+        (letter, index) => index !== checkIndex
+      );
     }
 
     if (this.letterIndex === this.currentWord.length) {
@@ -62,7 +53,25 @@ export default class Game {
     return isCorrect;
   }
 
+  private get currentWord(): string {
+    return this.words[this.round - 1];
+  }
+
+  private initNextRound() {
+    if (this.round === this.roundsAmount) {
+      this.isFinished = true;
+
+      return;
+    }
+
+    this.round = this.round + 1;
+    this.letterIndex = INITIAL_LETTER_INDEX;
+    this.setShuffledLetters();
+  }
+
   private setShuffledLetters() {
-    this.shuffledLetters = WordsUtils.shuffleLetters(this.currentWord);
+    this.shuffledLetters = WordsUtils.shuffleLetters(
+      this.currentWord.split("")
+    );
   }
 }

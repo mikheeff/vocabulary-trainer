@@ -1,9 +1,6 @@
 export abstract class WordsUtils {
-  static shuffleLetters(word: string): string {
-    return word
-      .split("")
-      .sort(() => 0.5 - Math.random())
-      .join("");
+  static shuffleLetters(word: string[]): string[] {
+    return word.sort(() => 0.5 - Math.random());
   }
 
   static shuffleArray(array: string[]): string[] {

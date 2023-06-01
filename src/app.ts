@@ -11,9 +11,28 @@ export const initApp = () => {
   );
 
   const game = new Game(words);
+  const ui = new TrainerUI({
+    letters: game.shuffledLetters,
+    answerLetters: [],
+    questionsAmount: game.roundsAmount,
+    questionNumber: game.round,
+  });
 
-  console.log(game.shuffledLetters);
+  ui.setListeners({ onLetterClick: getButtonClickHandler(game, ui) });
+  ui.init();
+};
 
-  TrainerUI.init(game.round, game.roundsAmount);
-  TrainerUI.drawQuestion(game.shuffledLetters);
+const getButtonClickHandler = (game: Game, ui: TrainerUI) => {
+  return (index: number) => {
+    const isCorrect = game.checkLetter(index);
+    ui.setQuestionNumber(game.round);
+
+    if (isCorrect) {
+      ui.setLetters(game.shuffledLetters, game.answeredLetters);
+    }
+
+    if (game.isFinished) {
+      ui.removeListeners();
+    }
+  };
 };
