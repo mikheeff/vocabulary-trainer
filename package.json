@@ -2,11 +2,10 @@
   "name": "vocabulary-trainer",
   "version": "1.0.0",
   "description": "English Vocabulary Trainer",
-  "main": "index.js",
   "scripts": {
-    "serve": "webpack serve --mode development",
-    "dev": "webpack --mode development",
-    "build": "webpack --mode production",
+    "serve": "webpack serve --config webpack.dev.ts",
+    "dev": "webpack --config webpack.dev.ts",
+    "build": "webpack --config webpack.prod.ts",
     "prettier-watch": "onchange \"**/*\" -- prettier --write --ignore-unknown {{changed}}"
   },
   "repository": {
@@ -36,6 +35,7 @@
     "typescript": "^5.0.4",
     "webpack": "^5.84.1",
     "webpack-cli": "^5.1.1",
-    "webpack-dev-server": "^4.15.0"
+    "webpack-dev-server": "^4.15.0",
+    "webpack-merge": "^5.9.0"
   }
 }
