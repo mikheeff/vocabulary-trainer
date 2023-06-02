@@ -23,36 +23,37 @@ export default class App {
       questionNumber: this.game.round,
     });
 
-    this.ui.setListeners({ onLetterClick: this.getButtonClickHandler() });
+    this.ui.setListeners({
+      onLetterClick: (index: number) => this.handleButtonClick(index),
+      onStartAgainClick: () => this.init(),
+    });
     this.ui.init();
   }
 
-  private getButtonClickHandler() {
-    return (index: number) => {
-      if (this.isLoading || !this.game || !this.ui) {
-        return;
-      }
+  private handleButtonClick(letterIndex: number) {
+    if (this.isLoading || !this.game || !this.ui) {
+      return;
+    }
 
-      const isCorrect = this.game.checkLetter(index);
+    const isCorrect = this.game.checkLetter(letterIndex);
 
-      if (!isCorrect && !this.game.isRoundFailed) {
-        this.ui.highlightLetterError(index);
+    if (!isCorrect && !this.game.isRoundFailed) {
+      this.ui.highlightLetterError(letterIndex);
 
-        return;
-      }
+      return;
+    }
 
-      if (this.game.isRoundFailed) {
-        this.ui.setIsError(true);
-      }
+    if (this.game.isRoundFailed) {
+      this.ui.setIsError(true);
+    }
 
-      this.ui.setLetters(this.game.shuffledLetters, this.game.answeredLetters);
+    this.ui.setLetters(this.game.shuffledLetters, this.game.answeredLetters);
 
-      if (this.game.isRoundCompleted) {
-        this.isLoading = true;
+    if (this.game.isRoundCompleted) {
+      this.isLoading = true;
 
-        window.setTimeout(() => this.handleRoundCompletion(), 1000);
-      }
-    };
+      window.setTimeout(() => this.handleRoundCompletion(), 1000);
+    }
   }
 
   handleRoundCompletion() {
@@ -70,6 +71,7 @@ export default class App {
         mistakesAmount: String(this.game.getTotalMistakesAmount()),
         mostMistakeWord: this.game.getWordWithMostMistakes() ?? "-",
       });
+      this.isLoading = false;
 
       return;
     }

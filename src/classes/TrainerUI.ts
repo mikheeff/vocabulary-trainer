@@ -13,6 +13,7 @@ interface TrainerUIProps {
 
 interface TrainerUIListeners {
   onLetterClick: (index: number) => void;
+  onStartAgainClick: () => void;
 }
 
 interface TrainerStats {
@@ -38,6 +39,7 @@ export class TrainerUI {
   private answerLetters: string[] = [];
   private questionNumber: number = 0;
   private onLetterClick: ((index: number) => void) | undefined = undefined;
+  private onStartAgainClick: (() => void) | undefined = undefined;
   private isError: boolean = false;
   private readonly questionsAmount: number = 0;
 
@@ -49,7 +51,7 @@ export class TrainerUI {
     document.querySelector("#letters");
   private answerContainerEl: HTMLDivElement | null =
     document.querySelector("#answer");
-  private statsTableEl: HTMLTableElement | null =
+  private statsContainerEl: HTMLDivElement | null =
     document.querySelector("#stats");
   private trainerEl: HTMLDivElement | null = document.querySelector("#trainer");
   private wordsWithoutMistakeCellEl: HTMLElement | null =
@@ -59,6 +61,8 @@ export class TrainerUI {
   private mostMistakeWordCellEl: HTMLElement | null = document.querySelector(
     "#word_most_mistakes"
   );
+  private startAgainButtonEl: HTMLSpanElement | null =
+    document.querySelector("#start-again");
 
   constructor(props: TrainerUIProps) {
     this.letters = props.letters;
@@ -69,6 +73,7 @@ export class TrainerUI {
 
   public setListeners(listeners: TrainerUIListeners) {
     this.onLetterClick = listeners.onLetterClick;
+    this.onStartAgainClick = listeners.onStartAgainClick;
   }
 
   public setQuestionNumber(questionNumber: number) {
@@ -138,12 +143,31 @@ export class TrainerUI {
       this.mostMistakeWordCellEl.textContent = stats.mostMistakeWord;
     }
 
-    if (this.statsTableEl) {
-      this.statsTableEl.style.display = "table";
+    if (this.statsContainerEl) {
+      this.statsContainerEl.style.display = "block";
+    }
+
+    const onStartAgainClick = this.onStartAgainClick;
+
+    if (this.startAgainButtonEl && onStartAgainClick) {
+      this.startAgainButtonEl.addEventListener("click", () => {
+        onStartAgainClick();
+      });
+    }
+  }
+
+  public showTrainer() {
+    if (this.trainerEl) {
+      this.trainerEl.style.display = "block";
+    }
+
+    if (this.statsContainerEl) {
+      this.statsContainerEl.style.display = "none";
     }
   }
 
   private render() {
+    this.showTrainer();
     this.renderCounters();
     this.renderLetters();
   }
