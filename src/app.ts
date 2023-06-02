@@ -17,20 +17,21 @@ export default class App {
 
     this.game = new Game(words);
 
-    if (this.game.hasSavedGame() && window.confirm('Load last game?')) {
-      this.game.loadSavedGame()
+
+    if (this.game.hasSavedGame()) {
+      this.handleSavedGame();
     }
 
     this.ui = new TrainerUI({
       letters: this.game.shuffledLetters,
       answerLetters: this.game.answeredLetters,
       questionsAmount: this.game.roundsAmount,
-      questionNumber: this.game.round,
+      questionNumber: this.game.round
     });
 
     this.ui.setListeners({
       onLetterClick: (index: number) => this.handleButtonClick(index),
-      onStartAgainClick: () => this.init(),
+      onStartAgainClick: () => this.init()
     });
     this.ui.init();
   }
@@ -63,6 +64,8 @@ export default class App {
   }
 
   handleRoundCompletion() {
+    this.isLoading = false;
+
     if (!this.game || !this.ui) {
       return;
     }
@@ -71,21 +74,43 @@ export default class App {
     this.game.saveGame();
 
     if (this.game.isFinished) {
-      this.ui.removeListeners();
-      this.ui.showStats({
-        wordsWithoutMistakes: String(this.game.getWordsAmountWithoutMistakes()),
-        mistakesAmount: String(this.game.getTotalMistakesAmount()),
-        mostMistakeWord: this.game.getWordWithMostMistakes() ?? "-",
-      });
-      this.game.deleteSavedGame();
-      this.isLoading = false;
+      this.handleGameFinishing();
 
       return;
     }
 
-    this.ui.setQuestionNumber(this.game.round);
+    this.ui.setShownQuestionCount(this.game.round);
     this.ui.setIsError(false);
     this.ui.setLetters(this.game.shuffledLetters, this.game.answeredLetters);
-    this.isLoading = false;
+  }
+
+  handleGameFinishing() {
+    if (!this.game || !this.ui) {
+      return;
+    }
+
+    this.ui.removeListeners();
+    this.ui.showStats({
+      wordsWithoutMistakes: String(this.game.getWordsAmountWithoutMistakes()),
+      mistakesAmount: String(this.game.getTotalMistakesAmount()),
+      mostMistakeWord: this.game.getWordWithMostMistakes() ?? "-"
+    });
+    this.game.deleteSavedGame();
+  }
+
+  handleSavedGame() {
+    if (!this.game) {
+      return;
+    }
+
+    const isLoad = window.confirm("Load last game?");
+
+    if (isLoad) {
+      this.game.loadSavedGame();
+
+      return;
+    }
+
+    this.game.deleteSavedGame();
   }
 }

@@ -37,7 +37,7 @@ const BUTTON_LABEL_MAP: Record<ButtonType, string> = {
 export class TrainerUI {
   private letters: string[] = [];
   private answerLetters: string[] = [];
-  private questionNumber: number = 0;
+  private shownQuestionCount: number = 0;
   private onLetterClick: ((index: number) => void) | undefined = undefined;
   private onStartAgainClick: (() => void) | undefined = undefined;
   private isError: boolean = false;
@@ -67,7 +67,7 @@ export class TrainerUI {
   constructor(props: TrainerUIProps) {
     this.letters = props.letters;
     this.answerLetters = props.answerLetters;
-    this.questionNumber = props.questionNumber;
+    this.shownQuestionCount = props.questionNumber;
     this.questionsAmount = props.questionsAmount;
   }
 
@@ -76,9 +76,8 @@ export class TrainerUI {
     this.onStartAgainClick = listeners.onStartAgainClick;
   }
 
-  public setQuestionNumber(questionNumber: number) {
-    this.questionNumber = questionNumber;
-
+  public setShownQuestionCount(count: number) {
+    this.shownQuestionCount = count;
     this.renderCounters();
   }
 
@@ -174,7 +173,7 @@ export class TrainerUI {
 
   private renderCounters() {
     if (this.currentQuestionEl) {
-      this.currentQuestionEl.textContent = String(this.questionNumber);
+      this.currentQuestionEl.textContent = String(this.shownQuestionCount);
     }
 
     if (this.totalQuestionsEl) {
