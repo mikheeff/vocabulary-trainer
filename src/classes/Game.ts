@@ -5,16 +5,23 @@ interface Word {
   mistakeAmount: number;
 }
 
+interface GameSnapshot {
+  words: Word[];
+  round: number;
+  currentLetters: string;
+}
+
 const INITIAL_ROUND = 1;
 const INITIAL_LETTER_INDEX = 0;
 const MAX_MISTAKE_AMOUNT = 3;
+const SNAPSHOT_KEY = 'SNAPSHOT_KEY';
 
 export default class Game {
   public round: number;
   public shuffledLetters: string[] = [];
   public isFinished: boolean = false;
 
-  private readonly words: Word[];
+  private words: Word[];
   private letterIndex: number = INITIAL_LETTER_INDEX;
 
   constructor(words: string[], round: number = INITIAL_ROUND) {
@@ -42,6 +49,10 @@ export default class Game {
 
   public get isRoundCompleted(): boolean {
     return this.letterIndex === this.currentWordText.length;
+  }
+
+  public hasSavedGame(): boolean {
+    return Boolean(window.localStorage.getItem(SNAPSHOT_KEY))
   }
 
   public checkLetter(checkIndex: number): boolean {
@@ -79,6 +90,20 @@ export default class Game {
     this.setShuffledLetters();
   }
 
+  public loadSavedGame() {
+    const item = window.localStorage.getItem(SNAPSHOT_KEY);
+
+    if (item) {
+      const { words, round, currentLetters }: GameSnapshot = JSON.parse(item);
+
+      this.words = words;
+      this.round = round;
+      this.shuffledLetters = currentLetters.split('');
+      this.letterIndex = this.currentWordText.length - this.shuffledLetters.length;
+      this.isFinished = false;
+    }
+  }
+
   public getWordsAmountWithoutMistakes(): number {
     return this.words.reduce((acc, word) => {
       return word.mistakeAmount === 0 ? acc + 1 : acc;
@@ -101,6 +126,20 @@ export default class Game {
         ? currentWord
         : maxMistakeWord;
     }).text;
+  }
+
+  public saveGame() {
+    const snapshot: GameSnapshot = {
+      words: this.words,
+      round: this.round,
+      currentLetters: this.shuffledLetters.join(''),
+    }
+
+    window.localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snapshot))
+  }
+
+  public deleteSavedGame() {
+    window.localStorage.removeItem(SNAPSHOT_KEY)
   }
 
   private countMistake(): void {

@@ -16,9 +16,14 @@ export default class App {
     );
 
     this.game = new Game(words);
+
+    if (this.game.hasSavedGame() && window.confirm('Load last game?')) {
+      this.game.loadSavedGame()
+    }
+
     this.ui = new TrainerUI({
       letters: this.game.shuffledLetters,
-      answerLetters: [],
+      answerLetters: this.game.answeredLetters,
       questionsAmount: this.game.roundsAmount,
       questionNumber: this.game.round,
     });
@@ -36,6 +41,7 @@ export default class App {
     }
 
     const isCorrect = this.game.checkLetter(letterIndex);
+    this.game.saveGame();
 
     if (!isCorrect && !this.game.isRoundFailed) {
       this.ui.highlightLetterError(letterIndex);
@@ -62,15 +68,16 @@ export default class App {
     }
 
     this.game.initNextRound();
+    this.game.saveGame();
 
     if (this.game.isFinished) {
       this.ui.removeListeners();
-
       this.ui.showStats({
         wordsWithoutMistakes: String(this.game.getWordsAmountWithoutMistakes()),
         mistakesAmount: String(this.game.getTotalMistakesAmount()),
         mostMistakeWord: this.game.getWordWithMostMistakes() ?? "-",
       });
+      this.game.deleteSavedGame();
       this.isLoading = false;
 
       return;
