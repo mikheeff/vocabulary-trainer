@@ -93,16 +93,18 @@ export default class Game {
   public loadSavedGame() {
     const item = window.localStorage.getItem(SNAPSHOT_KEY);
 
-    if (item) {
-      const { words, round, currentLetters }: GameSnapshot = JSON.parse(item);
-
-      this.words = words;
-      this.round = round;
-      this.shuffledLetters = currentLetters.split("");
-      this.letterIndex =
-        this.currentWordText.length - this.shuffledLetters.length;
-      this.isFinished = false;
+    if (!item) {
+      return;
     }
+
+    const { words, round, currentLetters }: GameSnapshot = JSON.parse(item);
+
+    this.words = words;
+    this.round = round;
+    this.shuffledLetters = currentLetters.split("");
+    this.letterIndex =
+      this.currentWordText.length - this.shuffledLetters.length;
+    this.isFinished = false;
   }
 
   public getWordsAmountWithoutMistakes(): number {
