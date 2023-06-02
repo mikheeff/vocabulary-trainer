@@ -17,7 +17,6 @@ export default class App {
 
     this.game = new Game(words);
 
-
     if (this.game.hasSavedGame()) {
       this.handleSavedGame();
     }
@@ -26,12 +25,12 @@ export default class App {
       letters: this.game.shuffledLetters,
       answerLetters: this.game.answeredLetters,
       questionsAmount: this.game.roundsAmount,
-      questionNumber: this.game.round
+      questionNumber: this.game.round,
     });
 
     this.ui.setListeners({
       onLetterClick: (index: number) => this.handleButtonClick(index),
-      onStartAgainClick: () => this.init()
+      onStartAgainClick: () => this.init(),
     });
     this.ui.init();
   }
@@ -93,7 +92,7 @@ export default class App {
     this.ui.showStats({
       wordsWithoutMistakes: String(this.game.getWordsAmountWithoutMistakes()),
       mistakesAmount: String(this.game.getTotalMistakesAmount()),
-      mostMistakeWord: this.game.getWordWithMostMistakes() ?? "-"
+      mostMistakeWord: this.game.getWordWithMostMistakes() ?? "-",
     });
     this.game.deleteSavedGame();
   }

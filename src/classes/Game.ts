@@ -14,7 +14,7 @@ interface GameSnapshot {
 const INITIAL_ROUND = 1;
 const INITIAL_LETTER_INDEX = 0;
 const MAX_MISTAKE_AMOUNT = 3;
-const SNAPSHOT_KEY = 'SNAPSHOT_KEY';
+const SNAPSHOT_KEY = "SNAPSHOT_KEY";
 
 export default class Game {
   public round: number;
@@ -52,7 +52,7 @@ export default class Game {
   }
 
   public hasSavedGame(): boolean {
-    return Boolean(window.localStorage.getItem(SNAPSHOT_KEY))
+    return Boolean(window.localStorage.getItem(SNAPSHOT_KEY));
   }
 
   public checkLetter(checkIndex: number): boolean {
@@ -98,8 +98,9 @@ export default class Game {
 
       this.words = words;
       this.round = round;
-      this.shuffledLetters = currentLetters.split('');
-      this.letterIndex = this.currentWordText.length - this.shuffledLetters.length;
+      this.shuffledLetters = currentLetters.split("");
+      this.letterIndex =
+        this.currentWordText.length - this.shuffledLetters.length;
       this.isFinished = false;
     }
   }
@@ -132,14 +133,14 @@ export default class Game {
     const snapshot: GameSnapshot = {
       words: this.words,
       round: this.round,
-      currentLetters: this.shuffledLetters.join(''),
-    }
+      currentLetters: this.shuffledLetters.join(""),
+    };
 
-    window.localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snapshot))
+    window.localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snapshot));
   }
 
   public deleteSavedGame() {
-    window.localStorage.removeItem(SNAPSHOT_KEY)
+    window.localStorage.removeItem(SNAPSHOT_KEY);
   }
 
   private countMistake(): void {
