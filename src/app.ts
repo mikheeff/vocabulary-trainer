@@ -132,8 +132,6 @@ export default class App {
       return;
     }
 
-    console.log(questionId);
-
     if (questionId < 1 || questionId > this.game.round || isNaN(questionId)) {
       return;
     }
