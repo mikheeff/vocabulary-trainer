@@ -1,9 +1,3 @@
-declare global {
-  interface Window {
-    trainerKeypressHandler: any;
-  }
-}
-
 interface TrainerUIProps {
   letters: string[];
   answerLetters: string[];
@@ -14,6 +8,7 @@ interface TrainerUIProps {
 interface TrainerUIListeners {
   onLetterClick: (index: number) => void;
   onStartAgainClick: () => void;
+  onNavigation: (questionId: number) => void;
 }
 
 interface TrainerStats {
@@ -34,12 +29,15 @@ const BUTTON_LABEL_MAP: Record<ButtonType, string> = {
   [ButtonType.PRIMARY]: "btn-primary",
 };
 
+const HASH_PREFIX = "question";
+
 export class TrainerUI {
   private letters: string[] = [];
   private answerLetters: string[] = [];
   private shownQuestionCount: number = 0;
   private onLetterClick: ((index: number) => void) | undefined = undefined;
   private onStartAgainClick: (() => void) | undefined = undefined;
+  private onNavigation: ((questionId: number) => void) | undefined = undefined;
   private isError: boolean = false;
   private readonly questionsAmount: number = 0;
 
@@ -74,10 +72,12 @@ export class TrainerUI {
   public setListeners(listeners: TrainerUIListeners) {
     this.onLetterClick = listeners.onLetterClick;
     this.onStartAgainClick = listeners.onStartAgainClick;
+    this.onNavigation = listeners.onNavigation;
   }
 
   public setShownQuestionCount(count: number) {
     this.shownQuestionCount = count;
+    this.setQuestionUrlHash(this.shownQuestionCount);
     this.renderCounters();
   }
 
@@ -94,8 +94,11 @@ export class TrainerUI {
 
   public init() {
     this.render();
+    this.setQuestionUrlHash(this.shownQuestionCount);
     document.addEventListener("keypress", this.handleKeypressEvent);
     window.trainerKeypressHandler = this.handleKeypressEvent;
+    window.addEventListener("hashchange", this.handleHashChange);
+    window.trainerHashchangeHandler = this.handleHashChange;
   }
 
   public removeListeners() {
@@ -234,4 +237,25 @@ export class TrainerUI {
       onLetterClick(index);
     }
   };
+
+  private handleHashChange = () => {
+    const questionId = this.gatQuestionIdFromUrl();
+    const onNavigation = this.onNavigation;
+    if (onNavigation) {
+      onNavigation(questionId);
+    }
+  };
+
+  private gatQuestionIdFromUrl(): number {
+    const hash = window.location.hash;
+    return parseInt(hash.replace(`#${HASH_PREFIX}`, ""));
+  }
+
+  private getQuestionIdHash(questionId: number): string {
+    return `${HASH_PREFIX}${questionId}`;
+  }
+
+  private setQuestionUrlHash(questionId: number) {
+    window.location.hash = this.getQuestionIdHash(questionId);
+  }
 }

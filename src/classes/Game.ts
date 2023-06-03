@@ -43,12 +43,20 @@ export default class Game {
     return this.currentWordText.slice(0, this.letterIndex).split("");
   }
 
-  public get isRoundFailed(): boolean {
-    return this.currentWord.mistakeAmount >= MAX_MISTAKE_AMOUNT;
+  public get isCurrentRoundFailed(): boolean {
+    return this.isRoundFailed(this.round);
   }
 
   public get isRoundCompleted(): boolean {
     return this.letterIndex === this.currentWordText.length;
+  }
+
+  public getWordByRound(round: number): Word {
+    return this.words[round - 1];
+  }
+
+  public isRoundFailed(round: number): boolean {
+    return this.words[round - 1].mistakeAmount >= MAX_MISTAKE_AMOUNT;
   }
 
   public hasSavedGame(): boolean {
@@ -160,7 +168,7 @@ export default class Game {
   private handleIncorrectLetter(): void {
     this.countMistake();
 
-    if (this.isRoundFailed) {
+    if (this.isCurrentRoundFailed) {
       this.letterIndex = this.currentWordText.length;
       this.shuffledLetters = [];
     }
